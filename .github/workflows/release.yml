@@ -7,6 +7,8 @@ on:
 jobs:
   train-model:
     runs-on: ubuntu-24.04
+    env:
+      VERSION: ${GITHUB_REF:11}
 
     steps:
     - name: Checkout code
@@ -20,19 +22,28 @@ jobs:
     - name: Install dependencies
       run: pip install -r requirements.txt
 
-    - name: Parse version info from tag
-      run: |
-        VERSION=${GITHUB_REF:11}
 
     - name: Train model and save artifact
-      run: python src/train.py $VERSION
+      run: python src/train.py ${{env.VERSION}}
 
 
-    - name: Upload model artifact
-      uses: actions/upload-artifact@v4
+    - name: Create Release
+      uses: actions/create-release@v1
+      id: create_release
+      env:
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
       with:
-        name: trained-model
-        path: |
-          models/*.joblib
-          models/*.pkl
+        tag_name: ${{github.ref}}
+        release_name: Model Release ${{env.VERSION}}
+        draft: false
+        prerelease: false
+
+    - name: Upload model weights
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      with:
+        upload_url: ${{steps.create_release.outputs.upload_url}}
+        asset_path: ./models/sentiment_model_v${env.VERSION}.pkl
+        asset_name: model_v${{env.VERSION}}.pkl
 
