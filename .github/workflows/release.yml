@@ -40,7 +40,7 @@ jobs:
     - name: Upload model weights
       uses: actions/upload-release-asset@v1
       with:
-        token: ${{secrets.RELEASE_SECRET}
+        token: ${{secrets.RELEASE_SECRET}}
         upload_url: ${{steps.create_release.outputs.upload_url}}
         asset_path: ./models/sentiment_model_v${env.VERSION}.pkl
         asset_name: model_v${{env.VERSION}}.pkl
