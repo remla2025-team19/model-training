@@ -7,13 +7,18 @@ on:
 jobs:
   train-model:
     runs-on: ubuntu-24.04
-    env:
-      VERSION: ${GITHUB_REF:11}
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Extract version from tag
+      id: version
+      run: |
+        TAG=${GITHUB_REF#refs/tags/}
+        echo "VERSION=${TAG#v}" >> $GITHUB_OUTPUT
+        echo "Extracted version is ${TAG#v}"
+      
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
@@ -24,7 +29,7 @@ jobs:
 
 
     - name: Train model and save artifact
-      run: python src/train.py ${{env.VERSION}}
+      run: python src/train.py ${{ steps.version.outputs.VERSION }}
 
 
     - name: Create Release
@@ -33,8 +38,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{secrets.RELEASE_SECRET}}
       with:
-        name: Model Release v${{env.VERSION}}
-        files: ./models/sentiment_model_v${{env.VERSION}}.pkl
+        name: Model Release v${{ steps.version.outputs.VERSION }}
+        files: ./models/sentiment_model_v${{ steps.version.outputs.VERSION }}.pkl
         draft: false
         prerelease: false
 
