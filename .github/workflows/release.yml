@@ -28,22 +28,13 @@ jobs:
 
 
     - name: Create Release
-      uses: actions/create-release@v1
+      uses: softprops/action-gh-release@v1
       id: create_release
       env:
         GITHUB_TOKEN: ${{secrets.RELEASE_SECRET}}
       with:
-        tag_name: ${{github.ref}}
-        release_name: Model Release ${{env.VERSION}}
+        name: Model Release v${{env.VERSION}}
+        files: ./models/sentiment_model_v${{env.VERSION}}.pkl
         draft: false
         prerelease: false
 
-    - name: Upload model weights
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{secrets.RELEASE_SECRET}}
-      with:
-        upload_url: ${{steps.create_release.outputs.upload_url}}
-        asset_path: ./models/sentiment_model_v${env.VERSION}.pkl
-        asset_name: model_v${{env.VERSION}}.pkl
-        asset_content_type: application/octet-stream
