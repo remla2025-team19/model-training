@@ -25,7 +25,7 @@ jobs:
         VERSION=${GITHUB_REF:11}
 
     - name: Train model and save artifact
-      run: python train.py VERSION
+      run: python src/train.py VERSION
 
 
     - name: Upload model artifact
