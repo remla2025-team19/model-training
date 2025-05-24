@@ -1,0 +1,4 @@
+# See https://bandit.readthedocs.io/en/latest/config.html for all options
+
+skips: []
+tests: []
