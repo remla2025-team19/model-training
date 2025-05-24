@@ -15,13 +15,8 @@ exclude =
 
 max-complexity = 12
 
-# You can ignore specific error codes if necessary. Use sparingly.
-# Example: ignore = E203, W503
-# E203: whitespace before ':' (often conflicts with Black formatter if not using it)
-# W503: line break before binary operator (PEP 8 changed its mind; Black prefers after)
-# It's generally better to fix warnings or use a formatter like Black.
+# Example ignore: allow multiple imports per line, 
+ignore = H301
 
-# To enable specific checks or plugins (e.g., flake8-bugbear for finding likely bugs).
-# By default, Flake8 runs enabled checks from pycodestyle and PyFlakes.
-# select = E,F,W,C90 # Default checks
-# select = E,F,W,C90,B,B9 # Example with flake8-bugbear (B, B9)
+# Example select: enable flake8-quotes
+select = Q0
