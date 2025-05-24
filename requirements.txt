@@ -3,3 +3,4 @@ scikit-learn>=1.0.0
 remla2025-team19-lib-ml @ git+https://github.com/remla2025-team19/lib-ml.git@v1.0.0
 bandit
 flake8
+flake8-quotes
