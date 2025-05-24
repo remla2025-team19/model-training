@@ -74,6 +74,21 @@ def save_model(classifier, vectorizer, version):
     return model_path
 
 
+# #  Uncomment these to check the custom pylint rules, expects to catch W9001, W9002, and C0415
+# def test_ml_lints():
+#     """Used to test ML lints"""
+
+#     df = pd.DataFrame()
+
+#     for _ in range(len(df)):
+#         pass
+
+#     import torch
+
+#     module = torch.nn.Module()
+#     module.forward()
+
+
 if __name__ == '__main__':
     import sys
 
