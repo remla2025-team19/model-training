@@ -1,0 +1,22 @@
+[flake8]
+max-line-length = 100
+exclude = 
+    .git,
+    __pycache__,
+    docs/,
+    build/,
+    dist/,
+    .venv/,
+    venv/,
+    data/,
+    models/,
+    notebooks/,
+    *.egg-info/
+
+max-complexity = 12
+
+# Example ignore: allow multiple imports per line, 
+ignore = H301
+
+# Example select: enable flake8-quotes
+select = Q0
