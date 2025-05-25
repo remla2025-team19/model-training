@@ -1,4 +1,3 @@
-awscli
 loguru
 python-dotenv
 ruff
