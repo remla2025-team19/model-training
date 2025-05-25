@@ -6,6 +6,21 @@
 
 Training pipeline for restaurant review sentiment analysis ML model
 
+## Setup
+
+```bash
+make create_environment
+make requirements
+```
+
+## Example Usage
+
+Pass the model version as an argument to the pipeline:
+
+```bash
+make pipeline VERSION=1.0.1
+```
+
 ## Project Organization
 
 ```
