@@ -88,7 +88,7 @@ persistent=yes
 
 # Minimum Python version to use for version dependent checks. Will default to
 # the version used to run pylint.
-py-version=3.11
+py-version=3.12.9
 
 # Discover python modules and packages in the file system subtree.
 recursive=no
@@ -109,10 +109,6 @@ unsafe-load-any-extension=no
 
 # In verbose mode, extra non-checker-related info will be displayed.
 #verbose=
-
-[MASTER]
-# Add repo to path so import can be resolved
-init-hook='import sys; sys.path.append("../lib-ml")'
 
 # Custom plugins
 load-plugins=custom_linting.code_smells
