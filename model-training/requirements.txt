@@ -1,3 +1,9 @@
+awscli
+loguru
+mkdocs
+python-dotenv
+ruff
+typer
 bandit==1.8.3
 click==8.2.1
 filelock==3.18.0
@@ -37,3 +43,4 @@ torch==2.7.0
 tqdm==4.67.1
 typing-extensions==4.13.2
 tzdata==2025.2
+-e .
