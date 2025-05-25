@@ -6,6 +6,11 @@
 
 Training pipeline for restaurant review sentiment analysis ML model
 
+## Requirements
+
+-   make
+-   [uv](https://docs.astral.sh/uv/#installation)
+
 ## Setup
 
 ```bash
