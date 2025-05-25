@@ -1,6 +1,5 @@
 awscli
 loguru
-mkdocs
 python-dotenv
 ruff
 typer

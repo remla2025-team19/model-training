@@ -18,7 +18,6 @@ requirements:
 	
 
 
-
 ## Delete all compiled Python files
 .PHONY: clean
 clean:
@@ -76,6 +75,16 @@ create_environment:
 .PHONY: data
 data: requirements
 	$(PYTHON_INTERPRETER) model_training/dataset.py
+
+## Run training script
+.PHONY: train
+train: requirements
+	$(PYTHON_INTERPRETER) model_training/modeling/train.py
+
+## Run full pipeline, read version from cli `make pipeline 
+.PHONY: pipeline
+pipeline: requirements
+	$(PYTHON_INTERPRETER) model_training/pipeline.py --version $(VERSION)
 
 
 #################################################################################
