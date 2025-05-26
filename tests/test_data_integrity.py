@@ -1,9 +1,23 @@
 import pandas as pd
 import pytest
 
+from model_training.dataset import preprocess_data
+from model_training.config import RAW_DATA_DIR, DEFAULT_TRAINING_DATA_URL
+
 @pytest.fixture(scope="session")
 def raw_df():
-    return pd.read_csv('data/a1_RestaurantReviews_HistoricDump.tsv', delimiter='\t', quoting=3)
+    """Load the raw restaurant reviews dataset, downloading if necessary."""
+    # Compute local path for the TSV file
+    file_name = DEFAULT_TRAINING_DATA_URL.split("/")[-1]
+    raw_file = RAW_DATA_DIR / file_name
+
+    # Ensure raw data is downloaded
+    if not raw_file.exists():
+        preprocess_data(input_dataset_url=DEFAULT_TRAINING_DATA_URL, output_path=None)
+
+    # Read the TSV into a DataFrame
+    df = pd.read_csv(raw_file, delimiter='\t', quoting=3)
+    return df
 
 def test_emptiness_and_columns(raw_df):
     assert not raw_df.empty, "DataFrame should not be empty"
