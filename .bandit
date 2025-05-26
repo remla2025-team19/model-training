@@ -1,0 +1,24 @@
+exclude_dirs:
+  - .github
+  - venv
+  - __pycache__
+  - data
+  - models
+  - notebooks
+  - tests
+skips:
+# Related to django
+  - B610
+  - B611
+  - B703
+# Low-level
+  - B302
+# Custom cipher
+  - B304
+  - B305
+# Crypto, XML imports
+  - B413
+  - B415
+  - B411
+  - B508
+  - B509
