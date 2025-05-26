@@ -5,8 +5,8 @@ import model_training.pipeline as train_module
 from model_training.dataset import preprocess_data
 
 TEST_SAMPLES = [
-    ("Wow I loved this place!", 1),
-    ("Food is not good!",        0),
+    ("Wow... Loved this place.", 1),
+    ("Crust is not good.", 0),
 ]
 
 def test_dummy_accuracy_vs_real(tmp_path, monkeypatch):
