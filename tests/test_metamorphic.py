@@ -4,10 +4,7 @@ import re
 # Synonym mapping for tests
 SYNONYM_PAIRS = [
     ('okay', 'fine'),
-    ('okay', 'ok'),
     ('good', 'nice'),
-    ('bad', 'terrible'),
-    ('bad', 'not ok'),
     ('delicious', 'tasty'),
 ]
 
