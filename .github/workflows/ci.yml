@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt \
+                      pytest pytest-cov pylint coverage-badge psutil typer loguru
+
+      - name: Lint
+        run: |
+          pylint model_training tests custom_linting --exit-zero > pylint.out
+          SCORE=$(grep "rated at" pylint.out | awk '{print $7}' | cut -d/ -f1)
+          python - <<'PY'
+            import os, sys
+            score = float(os.environ['SCORE'])
+            print(f"Pylint score: {score}")
+            if score < 7.0: sys.exit(1)
+            PY
+
+      - name: Run tests + coverage
+        run: |
+          pytest --cov=model_training --cov-report=xml
+          coverage-badge -o coverage.svg
+          scripts/compute_adequacy.py
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: coverage.xml
