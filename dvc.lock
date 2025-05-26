@@ -46,3 +46,27 @@ stages:
       hash: md5
       md5: da2dcbbc52cd330508fba7a90f9d6f77
       size: 85398
+  evaluate:
+    cmd: python src/evaluate.py data/raw/restaurant_sentiment.csv models/sentiment_model_v1.0.0.pkl
+      metrics/eval_metrics.json
+    deps:
+    - path: data/raw/restaurant_sentiment.csv
+      hash: md5
+      md5: 102f1f4193e0bdebdd6cce7f13e0a839
+      size: 54686
+    - path: models/sentiment_model_v1.0.0.pkl
+      hash: md5
+      md5: da2dcbbc52cd330508fba7a90f9d6f77
+      size: 85398
+    - path: src/evaluate.py
+      hash: md5
+      md5: b4b1d2816359719eae04698b19014833
+      size: 1715
+    params:
+      params.yaml:
+        evaluate.seed: 42
+    outs:
+    - path: metrics/eval_metrics.json
+      hash: md5
+      md5: 5002a717d1f26fa9b36ff102ccaea832
+      size: 160
