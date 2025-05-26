@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main, sam/a4 ]
+  pull_request:
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12.9'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt \
+                      pytest pytest-cov pylint coverage-badge psutil typer loguru
+
+      - name: Lint
+        run: |
+          # Always dump pylint output so we can see why it failed
+          pylint model_training tests custom_linting --exit-zero > pylint.out || true
+          echo "---- Pylint output start ----"
+          cat pylint.out
+          echo "---- Pylint output end ----"
+
+          SCORE=$(grep "rated at" pylint.out \
+            | sed -E 's/.*rated at ([0-9]+\.[0-9]+)\/.*/\1/' \
+            || echo "0")
+
+          echo "Pylint score: $SCORE"
+          awk "BEGIN {exit !($SCORE >= 7.0)}"
+
+      - name: Run tests + coverage
+        run: |
+          pytest --cov=model_training --cov-report=xml
+          coverage-badge -o coverage.svg
+          python scripts/compute_adequacy.py
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: coverage-report
+          path: coverage.xml
