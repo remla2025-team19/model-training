@@ -26,14 +26,18 @@ jobs:
 
       - name: Lint
         run: |
-          pylint model_training tests custom_linting --exit-zero > pylint.out
-          SCORE=$(grep "rated at" pylint.out | awk '{print $7}' | cut -d/ -f1)
-          python - <<'PY'
-          import os, sys
-          score = float(os.environ['SCORE'])
-          print(f"Pylint score: {score}")
-          if score < 7.0: sys.exit(1)
-          PY
+          # Always dump pylint output so we can see why it failed
+          pylint model_training tests custom_linting --exit-zero > pylint.out || true
+          echo "---- Pylint output start ----"
+          cat pylint.out
+          echo "---- Pylint output end ----"
+
+          SCORE=$(grep "rated at" pylint.out \
+            | sed -E 's/.*rated at ([0-9]+\.[0-9]+)\/.*/\1/' \
+            || echo "0")
+
+          echo "Pylint score: $SCORE"
+          awk "BEGIN {exit !($SCORE >= 7.0)}"
 
       - name: Run tests + coverage
         run: |
