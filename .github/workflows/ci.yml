@@ -29,11 +29,11 @@ jobs:
           pylint model_training tests custom_linting --exit-zero > pylint.out
           SCORE=$(grep "rated at" pylint.out | awk '{print $7}' | cut -d/ -f1)
           python - <<'PY'
-            import os, sys
-            score = float(os.environ['SCORE'])
-            print(f"Pylint score: {score}")
-            if score < 7.0: sys.exit(1)
-            PY
+          import os, sys
+          score = float(os.environ['SCORE'])
+          print(f"Pylint score: {score}")
+          if score < 7.0: sys.exit(1)
+          PY
 
       - name: Run tests + coverage
         run: |
