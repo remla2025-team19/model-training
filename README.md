@@ -79,7 +79,11 @@ dvc remote modify --local sentiment_remote credentialpath `/path/to/remla_secret
 dvc repro
 dvc push
 ```
-5. Conduct custom experiments by altering your parameters in params.yaml
+5. To run specific stages
+```bash
+dvc repro prepare
+```
+6. Conduct custom experiments by altering your parameters in params.yaml
 ```bash
 dvc exp run -S {stage_name}.{parameter}={value}
 ```
