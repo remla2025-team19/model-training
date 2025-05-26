@@ -1,6 +1,7 @@
 name: CI
 
 on:
+  workflow_dispatch:
   push:
     branches: [ main, sam/a4 ]
   pull_request:
@@ -41,7 +42,7 @@ jobs:
           scripts/compute_adequacy.py
 
       - name: Upload coverage report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: coverage-report
           path: coverage.xml
