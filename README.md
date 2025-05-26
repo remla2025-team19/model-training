@@ -3,9 +3,10 @@
 <a target="_blank" href="https://cookiecutter-data-science.drivendata.org/">
     <img src="https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter" />
 </a>
-Repository Link: https://github.com/remla2025-team19/model-training
+
 Training pipeline for restaurant review sentiment analysis ML model
 
+Repository Link: https://github.com/remla2025-team19/model-training
 ## Requirements
 
 -   make
