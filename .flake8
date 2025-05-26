@@ -1,0 +1,9 @@
+[flake8]
+# Ensures functions are maintainable and not too complex
+max-complexity = 10
+
+# From module import *, allow multiple imports, allow trailing whitespace
+ignore = F403, H301, W291
+
+# Undefined name and unused import detection
+select = F
