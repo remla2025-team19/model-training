@@ -39,7 +39,7 @@ def test_review_length(raw_df):
 def test_no_missing_values(raw_df):
     assert raw_df.isnull().sum().sum() == 0, "There should be no missing values in the dataset"
 
-@pytest.mark.parametrize("invalid", ["", "  ", None, "\n", "\t"])
+@pytest.mark.parametrize("invalid", ["", "  ", "\n", "\t"])
 def test_no_invalid_placeholders(raw_df, invalid):
     reviews = raw_df['Review'].dropna().astype(str)
     assert not reviews.str.fullmatch(invalid).any(), f"'Review' column should not contain placeholder '{invalid}'"

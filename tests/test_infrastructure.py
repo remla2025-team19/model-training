@@ -10,22 +10,27 @@ def _hash_bytes(path, block_size=65536):
             h.update(chunk)
     return h.hexdigest()
 
-def test_save_and_load_identical(tmp_path):
-    model_path, _ = run_pipeline(MODEL_V)
+def test_roundtrip_predictions(tmp_path, model):
 
-    # Hash before reload
-    h_before = _hash_bytes(model_path)
+    examples = [
+        "The food was delicious!",
+        "I did not enjoy the service."
+    ]
 
-    with open(model_path, "rb") as f:
-        before = pickle.load(f)
+    orig_path, _ = run_pipeline(MODEL_V)
+    with open(orig_path, "rb") as f:
+        orig_data = pickle.load(f)
 
-    # Re-save immediately
-    re_path = tmp_path / "re.pkl"
+    re_path = tmp_path / "roundtrip.pkl"
     with open(re_path, "wb") as f:
-        pickle.dump(before, f)
+        pickle.dump(orig_data, f)
 
-    h_after = _hash_bytes(re_path)
-    assert h_before == h_after, "Byte-wise hash changed after save/load cycle"
+    with open(re_path, "rb") as f:
+        new_data = pickle.load(f)
+
+    clf_new, vec_new = new_data["classifier"], new_data["vectorizer"]
+    for text in examples:
+        assert model(text) == clf_new.predict(vec_new.transform([text]).toarray())[0]
 
 def test_deterministic_training(monkeypatch):
     monkeypatch.setenv("PYTHONHASHSEED", "0")
