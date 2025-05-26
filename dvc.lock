@@ -1,0 +1,28 @@
+schema: '2.0'
+stages:
+  download:
+    cmd: python3.12 -m model_training.dataset download
+    outs:
+    - path: data/raw/restaurant_sentiment.csv
+      hash: md5
+      md5: 102f1f4193e0bdebdd6cce7f13e0a839
+      size: 54686
+  prepare:
+    cmd: python3.12 -m model_training.dataset main
+    deps:
+    - path: data/raw/restaurant_sentiment.csv
+      hash: md5
+      md5: 102f1f4193e0bdebdd6cce7f13e0a839
+      size: 54686
+    - path: model_training/dataset.py
+      hash: md5
+      md5: e588a0b8e16e6eb641caaf6a3e0bd003
+      size: 2360
+    params:
+      params.yaml:
+        prepare.seed: 42
+    outs:
+    - path: data/processed/dataset.csv
+      hash: md5
+      md5: 95eda564df458bf9e1c047ffaeda112b
+      size: 2566873
