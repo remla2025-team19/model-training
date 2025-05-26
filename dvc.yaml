@@ -1,0 +1,35 @@
+stages:
+  download:
+    cmd: python3 -m model_training.dataset download
+    outs:
+    - data/raw/restaurant_sentiment.csv
+  prepare:
+    cmd: python3 -m model_training.dataset main
+    deps:
+    - data/raw/restaurant_sentiment.csv
+    - model_training/dataset.py
+    outs:
+    - data/processed/dataset.csv
+    params:
+    - prepare.seed
+  train:
+    cmd: python3 -m model_training.pipeline
+    deps:
+    - data/processed/dataset.csv
+    - model_training/pipeline.py
+    params:
+    - train.n_estimators
+    - train.seed
+    outs:
+    - models/sentiment_model_v1.0.0.pkl
+  evaluate:
+    cmd: python src/evaluate.py data/raw/restaurant_sentiment.csv models/sentiment_model_v1.0.0.pkl metrics/eval_metrics.json
+    deps:
+    - src/evaluate.py
+    - data/raw/restaurant_sentiment.csv
+    - models/sentiment_model_v1.0.0.pkl
+    params:
+    - evaluate.seed
+    metrics:
+    - metrics/eval_metrics.json:
+        cache: false
