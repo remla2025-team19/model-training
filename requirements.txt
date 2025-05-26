@@ -31,10 +31,11 @@ pyflakes==3.3.2
 pygments==2.19.1
 python-dateutil==2.9.0.post0
 python-dotenv==1.1.0
+pytest==7.4.4
 pytz==2025.2
 pyyaml==6.0.2
 regex==2024.11.6
-remla2025-team19-lib-ml @ git+https://github.com/remla2025-team19/lib-ml.git@c549aec09929fc0a0d20fac439efd363e84cbbca
+#remla2025-team19-lib-ml @ git+https://github.com/remla2025-team19/lib-ml.git@c549aec09929fc0a0d20fac439efd363e84cbbca
 requests==2.32.3
 rich==14.0.0
 rsa==4.7.2

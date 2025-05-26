@@ -5,27 +5,27 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, classification_report
+#from lib_ml.preprocessing import TextPreprocessor
+import sys
+import os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'lib-ml', 'src')))
 from lib_ml.preprocessing import TextPreprocessor
 
 def load_data():
     """Load the restaurant reviews dataset"""
-    return pd.read_csv('data/a1_RestaurantReviews_HistoricDump.tsv', delimiter='\t', quoting=3)
+    #return pd.read_csv('data/a1_RestaurantReviews_HistoricDump.tsv', delimiter='\t', quoting=3)
+    return pd.read_csv("data/processed/dataset.csv")
 
 def train_model(model_version="1.0.0"):
     """Train the sentiment analysis model"""
     # Load data
     dataset = load_data()
     
-    # Initialize preprocessor
-    preprocessor = TextPreprocessor()
-    
-    # Preprocess texts
-    corpus = preprocessor.preprocess_texts(dataset['Review'].tolist())
-    
-    # Create bag of words
-    cv = CountVectorizer(max_features=1420)
-    X = cv.fit_transform(corpus).toarray()
-    y = dataset.iloc[:, -1].values
+    # Use preprocessed dataset
+    X = dataset.drop(columns=["Label"]).to_numpy()
+    y = dataset["Label"].to_numpy()
+    cv = None  # or load from disk if needed
+
     
     # Split data
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
