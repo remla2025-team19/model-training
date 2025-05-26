@@ -16,11 +16,9 @@ SYNONYM_PAIRS = [
 ])
 
 def test_synonym_invariance(model, orig, alt):
-    """Replacing words with synonyms should not flip sentiment."""
     assert model(orig) == model(alt)
 
 def test_single_word_invariance(model, a, b):
-
     orig = f'The {a} pizza'
     alt  = f'The {b} pizza'
     assert model(orig) == model(alt)

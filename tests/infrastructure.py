@@ -1,5 +1,5 @@
 import os, hashlib, pickle, pytest
-from src.train import train_model
+from model_training.pipeline import run_pipeline
 
 MODEL_V = "1.0.0"
 
@@ -11,7 +11,7 @@ def _hash_bytes(path, block_size=65536):
     return h.hexdigest()
 
 def test_save_and_load_identical(tmp_path):
-    model_path, _ = train_model(MODEL_V)
+    model_path, _ = run_pipeline(MODEL_V)
 
     # Hash before reload
     h_before = _hash_bytes(model_path)
@@ -29,7 +29,7 @@ def test_save_and_load_identical(tmp_path):
 
 def test_deterministic_training(monkeypatch):
     monkeypatch.setenv("PYTHONHASHSEED", "0")
-    p1, acc1 = train_model("1.0.0-det-1")
-    p2, acc2 = train_model("1.0.0-det-2")
+    p1, acc1 = run_pipeline("1.0.0-det-1")
+    p2, acc2 = run_pipeline("1.0.0-det-2")
 
     assert abs(acc1 - acc2) < 0.02, "Accuracy drifted >2 pp between runs"
