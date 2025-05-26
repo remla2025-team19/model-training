@@ -39,12 +39,12 @@ stages:
       size: 1825
     params:
       params.yaml:
-        train.n_estimators: 100
+        train.n_estimators: 50
         train.seed: 42
     outs:
     - path: models/sentiment_model_v1.0.0.pkl
       hash: md5
-      md5: da2dcbbc52cd330508fba7a90f9d6f77
+      md5: d125269c3727cb27b11f9b7be7508d94
       size: 85398
   evaluate:
     cmd: python src/evaluate.py data/raw/restaurant_sentiment.csv models/sentiment_model_v1.0.0.pkl
@@ -56,7 +56,7 @@ stages:
       size: 54686
     - path: models/sentiment_model_v1.0.0.pkl
       hash: md5
-      md5: da2dcbbc52cd330508fba7a90f9d6f77
+      md5: d125269c3727cb27b11f9b7be7508d94
       size: 85398
     - path: src/evaluate.py
       hash: md5
