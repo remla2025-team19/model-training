@@ -24,7 +24,7 @@ def train_model(model_version="1.0.0"):
     # Use preprocessed dataset
     X = dataset.drop(columns=["Label"]).to_numpy()
     y = dataset["Label"].to_numpy()
-    cv = None  # or load from disk if needed
+    cv = None  
 
     
     # Split data
