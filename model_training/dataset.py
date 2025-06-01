@@ -1,14 +1,12 @@
-from pathlib import Path
-from typing import Optional
-import sys
-import os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'lib-ml', 'src')))
-from lib_ml.preprocessing import TextPreprocessor
-from loguru import logger
+import typer
 import pandas as pd
 import requests
+from pathlib import Path
+from typing import Optional
+from lib_ml.preprocessing import TextPreprocessor
+from loguru import logger
 from sklearn.feature_extraction.text import CountVectorizer
-import typer
+from sklearn.model_selection import train_test_split
 
 from model_training.config import DEFAULT_TRAINING_DATA_URL, PROCESSED_DATA_DIR, RAW_DATA_DIR
 
@@ -19,6 +17,9 @@ def preprocess_data(
     input_dataset_url: str = DEFAULT_TRAINING_DATA_URL,
     output_path: Optional[Path] = None,
 ):
+    """
+    Preprocess the restaurant reviews dataset.
+    """
     file_name = Path(input_dataset_url.split("/")[-1])
     local_input_path = RAW_DATA_DIR / file_name
 
@@ -26,7 +27,7 @@ def preprocess_data(
 
     logger.info(f"Downloading dataset from {input_dataset_url} to {local_input_path}...")
     try:
-        response = requests.get(input_dataset_url, stream=True)
+        response = requests.get(input_dataset_url, stream=True, timeout=10)
         response.raise_for_status()
         with open(local_input_path, "wb") as f:
             for chunk in response.iter_content(chunk_size=8192):
@@ -43,6 +44,11 @@ def preprocess_data(
     preprocessor = TextPreprocessor()
 
     corpus = preprocessor.preprocess_texts(dataset["Review"].tolist())
+
+    # ✅ Split before fitting to avoid data leakage
+    corpus_train, corpus_test, y_train, y_test = train_test_split(
+        corpus, y, test_size=0.2, random_state=42
+    )
 
     cv = CountVectorizer(max_features=1420)
     X = cv.fit_transform(corpus).toarray()
@@ -65,6 +71,9 @@ def main(
     input_dataset_url: str = DEFAULT_TRAINING_DATA_URL,
     output_path: Path = PROCESSED_DATA_DIR / "dataset.csv",
 ):
+    """
+    Main function to preprocess the dataset.
+    """
     preprocess_data(input_dataset_url, output_path)
 
 

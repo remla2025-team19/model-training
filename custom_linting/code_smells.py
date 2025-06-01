@@ -1,9 +1,7 @@
 from pylint.checkers import BaseChecker
-from pylint.interfaces import IAstroidChecker
 import astroid
 
 class RandomnessUncontrolledChecker(BaseChecker):
-    __implements__ = IAstroidChecker
     name = 'randomness-uncontrolled'
     priority = -1
     # Custom message
@@ -39,7 +37,6 @@ class RandomnessUncontrolledChecker(BaseChecker):
         self.seed_set = False
 
 class DataLeakageChecker(BaseChecker):
-    __implements__ = IAstroidChecker
     name = 'data-leakage-checker'
     priority = -1
     msgs = {

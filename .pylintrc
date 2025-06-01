@@ -81,7 +81,8 @@ limit-inference-results=100
 
 # List of plugins (as comma separated values of python module names) to load,
 # usually to register additional checkers.
-load-plugins=
+# Custom plugins
+load-plugins=custom_linting.code_smells
 
 # Pickle collected data for later comparisons.
 persistent=yes
@@ -110,8 +111,6 @@ unsafe-load-any-extension=no
 # In verbose mode, extra non-checker-related info will be displayed.
 #verbose=
 
-# Custom plugins
-load-plugins=custom_linting.code_smells
 
 
 [BASIC]
@@ -192,6 +191,10 @@ good-names=i,
            j,
            X, #allow for single letter variable names
            Y, #allow for single letter variable names
+           X_train, #consider ML specific variable names
+           X_test,
+           Y_train,
+           Y_test,
            k,
            ex,
            Run,

@@ -13,7 +13,11 @@ logger.info(f"PROJ_ROOT path is: {PROJ_ROOT}")
 DATA_DIR = PROJ_ROOT / "data"
 RAW_DATA_DIR = DATA_DIR / "raw"
 PROCESSED_DATA_DIR = DATA_DIR / "processed"
-DEFAULT_TRAINING_DATA_URL = "https://raw.githubusercontent.com/proksch/restaurant-sentiment/main/a1_RestaurantReviews_HistoricDump.tsv"
+DEFAULT_TRAINING_DATA_URL = (
+    "https://raw.githubusercontent.com/proksch/restaurant-sentiment/"
+    "main/a1_RestaurantReviews_HistoricDump.tsv"
+)
+
 
 MODELS_DIR = PROJ_ROOT / "models"
 
