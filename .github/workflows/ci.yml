@@ -43,7 +43,7 @@ jobs:
           SCORE=$(pylint model_training/ src/ | tee pylint_output.txt | grep 'Your code has been rated at' | sed -E 's/.*rated at ([0-9\.]+)\/10.*/\1/')
           echo "Pylint score is $SCORE"
           mkdir -p badges
-          pybadges --left-text="pylint" --right-text="$SCORE/10" --right-color="green" > badges/pylint.svg
+          python -m pybadges --left-text="pylint" --right-text="$SCORE/10" --right-color="green" > badges/pylint.svg
 
       - name: Commit and push badge
         run: |
