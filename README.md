@@ -11,6 +11,7 @@
 
 Training pipeline for restaurant review sentiment analysis ML model
 
+Repository Link: https://github.com/remla2025-team19/model-training
 ## Requirements
 
 -   make
@@ -65,4 +66,31 @@ make pipeline VERSION=1.0.1
     └── pipeline.py             <- Code to run the full training pipeline
 ```
 
+## Pipeline Management with DVC
+1. Setting up the Google Cloud remote storage.
+First ensure that ```dvc[gs]``` is installed
+```bash
+pip install dvc[gs]
+```
+2. Create remote 
+```bash
+dvc remote add -d sentiment_remote gs://remla2025-team19-bucket
+```
+3. Add credentials (keep it local since it is a secret)
+```bash
+dvc remote modify --local sentiment_remote credentialpath `/path/to/remla_secret.json`
+```
+4. Run your pipeline and push
+```bash
+dvc repro
+dvc push
+```
+5. To run specific stages
+```bash
+dvc repro prepare
+```
+6. Conduct custom experiments by altering your parameters in params.yaml
+```bash
+dvc exp run -S {stage_name}.{parameter}={value}
+```
 ---

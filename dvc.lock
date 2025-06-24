@@ -1,0 +1,72 @@
+schema: '2.0'
+stages:
+  download:
+    cmd: python3 -m model_training.dataset download
+    outs:
+    - path: data/raw/restaurant_sentiment.csv
+      hash: md5
+      md5: 102f1f4193e0bdebdd6cce7f13e0a839
+      size: 54686
+  prepare:
+    cmd: python3 -m model_training.dataset main
+    deps:
+    - path: data/raw/restaurant_sentiment.csv
+      hash: md5
+      md5: 102f1f4193e0bdebdd6cce7f13e0a839
+      size: 54686
+    - path: model_training/dataset.py
+      hash: md5
+      md5: e588a0b8e16e6eb641caaf6a3e0bd003
+      size: 2360
+    params:
+      params.yaml:
+        prepare.seed: 42
+    outs:
+    - path: data/processed/dataset.csv
+      hash: md5
+      md5: 95eda564df458bf9e1c047ffaeda112b
+      size: 2566873
+  train:
+    cmd: python3 -m model_training.pipeline
+    deps:
+    - path: data/processed/dataset.csv
+      hash: md5
+      md5: 95eda564df458bf9e1c047ffaeda112b
+      size: 2566873
+    - path: model_training/pipeline.py
+      hash: md5
+      md5: 52202097d1f8dce409c628f2a992bb0f
+      size: 1825
+    params:
+      params.yaml:
+        train.n_estimators: 50
+        train.seed: 42
+    outs:
+    - path: models/sentiment_model_v1.0.0.pkl
+      hash: md5
+      md5: d125269c3727cb27b11f9b7be7508d94
+      size: 85398
+  evaluate:
+    cmd: python src/evaluate.py data/raw/restaurant_sentiment.csv models/sentiment_model_v1.0.0.pkl
+      metrics/eval_metrics.json
+    deps:
+    - path: data/raw/restaurant_sentiment.csv
+      hash: md5
+      md5: 102f1f4193e0bdebdd6cce7f13e0a839
+      size: 54686
+    - path: models/sentiment_model_v1.0.0.pkl
+      hash: md5
+      md5: d125269c3727cb27b11f9b7be7508d94
+      size: 85398
+    - path: src/evaluate.py
+      hash: md5
+      md5: b4b1d2816359719eae04698b19014833
+      size: 1715
+    params:
+      params.yaml:
+        evaluate.seed: 42
+    outs:
+    - path: metrics/eval_metrics.json
+      hash: md5
+      md5: 5002a717d1f26fa9b36ff102ccaea832
+      size: 160

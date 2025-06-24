@@ -1,0 +1,10 @@
+prepare:
+  seed: 42
+
+train:
+  n_estimators: 50
+  seed: 42
+  version: 1.0.0
+
+evaluate:
+  seed: 42

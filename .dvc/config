@@ -1,0 +1,6 @@
+[core]
+    analytics = false
+    autostage = true
+    remote = sentiment_remote
+['remote "sentiment_remote"']
+    url = gs://remla2025-team19-bucket

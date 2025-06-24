@@ -50,6 +50,7 @@ def preprocess_data(
     input_path: str = RAW_DATA_DIR / "restaurant_sentiment.csv",
     output_path: Optional[Path] = None,
 ):
+
     """Preprocess the restaurant sentiment dataset.
     Args:
         input_path (str): Path to the raw dataset.

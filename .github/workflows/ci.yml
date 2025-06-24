@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   test:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -43,8 +43,14 @@ jobs:
 
       - name: Generate pylint badge
         run: |
-          SCORE=$(pylint model_training/ src/ | tee pylint_output.txt | grep 'Your code has been rated at' | sed -E 's/.*rated at ([0-9\.]+)\/10.*/\1/')
-          echo "Pylint score is $SCORE"
+          pylint model_training/ src/ --exit-zero > pylint_output.txt || true
+          echo "---- Pylint output start ----"
+          cat pylint_output.txt
+          echo "---- Pylint output end ----"
+
+          SCORE=$(grep "rated at" pylint_output.txt | sed -E 's/.*rated at ([0-9]+\.[0-9]+)\/.*/\1/' || echo "0")
+          echo "Pylint score: $SCORE"
+
           mkdir -p badges
           python -m pybadges --left-text="pylint" --right-text="$SCORE/10" --right-color="green" > badges/pylint.svg
 
@@ -60,6 +66,7 @@ jobs:
         run: |
           COVERAGE=$(grep -Po 'line-rate="\K[\d.]+' coverage.xml | awk '{ printf("%.0f", $1 * 100) }')
           echo "Coverage is $COVERAGE%"
+
           mkdir -p badges
           python -m pybadges --left-text="coverage" --right-text="$COVERAGE%" --right-color="blue" > badges/coverage.svg
 
@@ -73,4 +80,3 @@ jobs:
           git commit -m "Auto-update pylint badge" || echo "No changes to commit"
           git push origin HEAD:${{ github.ref_name }}
         
-
