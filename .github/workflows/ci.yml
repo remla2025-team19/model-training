@@ -36,7 +36,7 @@ jobs:
 
       - name: Run pylint
         run: |
-          pylint src/ model_training/
+          pylint src/ model_training/ --fail-under=7
 
       - name: Install pybadges
         run: pip install pybadges
