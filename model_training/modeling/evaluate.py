@@ -35,7 +35,7 @@ def evaluate_model(classifier, X_test, y_test, report_path: str | Path | None = 
         # Ensure reports directory exists
         report_file.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(report_file, "w") as f:
+        with open(report_file, "w", encoding="utf-8") as f:
             f.write(f"Model accuracy: {accuracy:.4f}\n")
             f.write("\nClassification Report:\n")
             f.write(class_report)
