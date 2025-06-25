@@ -33,6 +33,11 @@ jobs:
         run: |
           pytest tests/ | tee test_output.txt
 
+      - name: Run tests with coverage
+        run: |
+          pytest --cov=src --cov-config=coverage.ini --cov-report=xml --cov-report=term tests/
+
+
       # - name: Run tests with coverage
       #   run: |
       #     pytest --cov=src --cov-report=xml --cov-report=term tests/
@@ -67,7 +72,7 @@ jobs:
 
       - name: Generate test coverage badge
         run: |
-          COVERAGE=$(grep -Po 'line-rate="\K[\d.]+' coverage.xml | awk '{ printf("%.0f", $1 * 100) }')
+          COVERAGE=$(grep -m 1 -Po 'line-rate="\K[\d.]+' coverage.xml | awk '{ printf("%.0f", $1 * 100) }')
           echo "Coverage is $COVERAGE%"
 
           mkdir -p badges

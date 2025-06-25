@@ -105,4 +105,5 @@ def pytest_terminal_summary(terminalreporter):
     terminalreporter.write_line(f"::ML_TEST_SCORE::{percentage:.0f}")
 
     with open("ml_test_score.txt", "w") as f:
-        f.write(percentage)
+        f.write(f"{percentage:.0f}")
+
