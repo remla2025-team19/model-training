@@ -65,13 +65,13 @@ jobs:
           mkdir -p badges
           python -m pybadges --left-text="adequacy" --right-text="$ADEQUACY_SCORE%" --right-color="orange" > badges/adequacy.svg
 
-      # - name: Generate test coverage badge
-      #   run: |
-      #     COVERAGE=$(grep -Po 'line-rate="\K[\d.]+' coverage.xml | awk '{ printf("%.0f", $1 * 100) }')
-      #     echo "Coverage is $COVERAGE%"
+      - name: Generate test coverage badge
+        run: |
+          COVERAGE=$(grep -Po 'line-rate="\K[\d.]+' coverage.xml | awk '{ printf("%.0f", $1 * 100) }')
+          echo "Coverage is $COVERAGE%"
 
-      #     mkdir -p badges
-      #     python -m pybadges --left-text="coverage" --right-text="$COVERAGE%" --right-color="blue" > badges/coverage.svg
+          mkdir -p badges
+          python -m pybadges --left-text="coverage" --right-text="$COVERAGE%" --right-color="blue" > badges/coverage.svg
 
 
       - name: Commit and push badge
@@ -80,8 +80,7 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
           git remote set-url origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/${{ github.repository }}
-          git add badges/pylint.svg badges/adequacy.svg
-          # badges/coverage.svg
+          git add badges/pylint.svg badges/adequacy.svg badges/coverage.svg
           git commit -m "Auto-update pylint badge" || echo "No changes to commit"
           git push origin HEAD:${{ github.ref_name }}
         
