@@ -56,7 +56,7 @@ jobs:
 
       - name: Generate test adequacy badge
         run: |
-          RAW_SCORE=$(grep "::ML_TEST_SCORE::" test_output.txt | cut -d ':' -f3)
+          RAW_SCORE=$(grep "::ML_TEST_SCORE::" test_output.txt | grep -oP '\d+$')
           ADEQUACY_SCORE=${RAW_SCORE:-0}
           echo "Adequacy score is $ADEQUACY_SCORE%"
           mkdir -p badges
