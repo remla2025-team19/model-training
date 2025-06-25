@@ -29,6 +29,9 @@ jobs:
         run: |
           python -m model_training.dataset main
 
+      - name: Run tests and capture adequacy score
+        run: |
+          pytest tests/ | tee test_output.txt
 
       # - name: Run tests with coverage
       #   run: |
