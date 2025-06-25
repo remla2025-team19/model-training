@@ -103,3 +103,6 @@ def pytest_terminal_summary(terminalreporter):
 
     percentage = (total_score / max_score) * 100 if max_score else 0
     terminalreporter.write_line(f"::ML_TEST_SCORE::{percentage:.0f}")
+
+    with open("ml_test_score.txt", "w") as f:
+        f.write(percentage)
