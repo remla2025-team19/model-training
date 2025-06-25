@@ -56,8 +56,8 @@ jobs:
 
       - name: Generate test adequacy badge
         run: |
-          CATEGORIES_COVERED=3  # update to 4 if you add monitoring
-          ADEQUACY_SCORE=$(( CATEGORIES_COVERED * 100 / 4 ))
+          RAW_SCORE=$(grep "::ML_TEST_SCORE::" test_output.txt | cut -d ':' -f3)
+          ADEQUACY_SCORE=${RAW_SCORE:-0}
           echo "Adequacy score is $ADEQUACY_SCORE%"
           mkdir -p badges
           python -m pybadges --left-text="adequacy" --right-text="$ADEQUACY_SCORE%" --right-color="orange" > badges/adequacy.svg

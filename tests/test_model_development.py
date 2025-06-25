@@ -9,6 +9,7 @@ TEST_SAMPLES = [
     ("Crust is not good.", 0),
 ]
 
+@pytest.mark.model_dev
 def test_dummy_accuracy_vs_real(tmp_path, monkeypatch):
     tiny_df = pd.DataFrame({
         "Review": [t for t,_ in TEST_SAMPLES],
@@ -40,10 +41,12 @@ def test_dummy_accuracy_vs_real(tmp_path, monkeypatch):
 
     assert dummy_acc < real_acc
 
+@pytest.mark.model_dev
 @pytest.mark.parametrize("text,expected", TEST_SAMPLES)
 def test_known_predictions(model, text, expected):
     assert model(text) == expected
 
+@pytest.mark.model_dev
 def test_long_review_handles(model):
     long_text = "word " * 600
     assert model(long_text) in (0, 1)

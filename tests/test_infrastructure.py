@@ -10,6 +10,7 @@ def _hash_bytes(path, block_size=65536):
             h.update(chunk)
     return h.hexdigest()
 
+@pytest.mark.infrastructure
 def test_roundtrip_predictions(tmp_path, model):
 
     examples = [
@@ -32,6 +33,7 @@ def test_roundtrip_predictions(tmp_path, model):
     for text in examples:
         assert model(text) == clf_new.predict(vec_new.transform([text]).toarray())[0]
 
+@pytest.mark.infrastructure
 def test_deterministic_training(monkeypatch):
     monkeypatch.setenv("PYTHONHASHSEED", "0")
     p1, acc1 = run_pipeline("1.0.0-det-1")

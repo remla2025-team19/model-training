@@ -86,7 +86,10 @@ def main(
     output_path: Path = PROCESSED_DATA_DIR / "dataset.csv",
 ):
     """Download and preprocess the restaurant sentiment dataset."""
-    preprocess_data(input_dataset_url, output_path)
+    raw_path = RAW_DATA_DIR / "restaurant_sentiment.csv"
+    get_data(input_dataset_url,raw_path)
+    preprocess_data(input_path=raw_path, output_path=output_path)
+    #preprocess_data(input_dataset_url, output_path)
 
 
 if __name__ == "__main__":

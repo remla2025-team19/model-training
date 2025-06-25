@@ -2,6 +2,7 @@ import pytest, time
 
 MAX_MS = 50
 
+@pytest.mark.monitoring
 def test_inference_latency(model):
     txt = "Really loved the ambience and the dessert!"
     start = time.perf_counter()
