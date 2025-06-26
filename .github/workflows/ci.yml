@@ -31,7 +31,7 @@ jobs:
 
       - name: Run tests and capture adequacy score
         run: |
-          pytest tests/ | tee test_output.txt
+          pytest tests/ | tee reports/test_output.txt
 
       - name: Run tests with coverage
         run: |
