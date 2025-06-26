@@ -69,3 +69,4 @@ pylint>=2.17
 flake8>=6.1
 bandit>=1.7
 remla2025-team19-lib-ml @ git+https://github.com/remla2025-team19/lib-ml.git@v1.0.0
+psutil>=5.9.0
