@@ -78,27 +78,27 @@ format:
 ## Download raw dataset
 .PHONY: download
 download:
-	$(PYTHON_VENV) -m model_training.dataset download
+	$(PYTHON_VENV) model_training/dataset.py download
 
 ## Preprocess raw data into cleaned dataset and vectorizer
 .PHONY: preprocess
 preprocess:
-	$(PYTHON_VENV) -m model_training.dataset preprocess
+	$(PYTHON_VENV) model_training/dataset.py preprocess
 
 ## Split processed data into train/test sets
 .PHONY: split
 split:
-	$(PYTHON_VENV) -m model_training.dataset split
+	$(PYTHON_VENV) model_training/dataset.py split
 
 ## Train machine learning model
 .PHONY: train
 train:
-	$(PYTHON_VENV) -m model_training.modeling.train
+	$(PYTHON_VENV) model_training/modeling/train.py train
 
 ## Evaluate trained model and generate metrics
 .PHONY: evaluate
 evaluate:
-	$(PYTHON_VENV) -m model_training.modeling.evaluate
+	$(PYTHON_VENV) model_training/modeling/evaluate.py evaluate
 
 ## Run complete ML pipeline from start to finish
 .PHONY: pipeline
