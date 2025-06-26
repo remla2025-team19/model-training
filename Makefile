@@ -93,12 +93,12 @@ split:
 ## Train machine learning model
 .PHONY: train
 train:
-	$(PYTHON_VENV) model_training/modeling/train.py train
+	$(PYTHON_VENV) model_training/modeling/train.py
 
 ## Evaluate trained model and generate metrics
 .PHONY: evaluate
 evaluate:
-	$(PYTHON_VENV) model_training/modeling/evaluate.py evaluate
+	$(PYTHON_VENV) model_training/modeling/evaluate.py
 
 ## Run complete ML pipeline from start to finish
 .PHONY: pipeline
