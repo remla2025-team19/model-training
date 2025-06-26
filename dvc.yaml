@@ -1,35 +1,52 @@
 stages:
   download:
-    cmd: python3 -m model_training.dataset download
+    cmd: make download
     outs:
       - data/raw/restaurant_sentiment.csv
-  prepare:
-    cmd: python3 -m model_training.dataset main
+  preprocess:
+    cmd: make preprocess
     deps:
       - data/raw/restaurant_sentiment.csv
       - model_training/dataset.py
     outs:
       - data/processed/dataset.csv
+      - data/processed/vectorizer.pkl
+    params:
+      - prepare.seed
+  split:
+    cmd: make split
+    deps:
+      - data/processed/dataset.csv
+      - data/processed/vectorizer.pkl
+      - model_training/dataset.py
+    outs:
+      - data/processed/train_dataset.csv
+      - data/processed/test_dataset.csv
     params:
       - prepare.seed
   train:
-    cmd: python3 -m model_training.pipeline
+    cmd: make train
     deps:
-      - data/processed/dataset.csv
-      - model_training/pipeline.py
+      - data/processed/train_dataset.csv
+      - data/processed/vectorizer.pkl
+      - model_training/modeling/train.py
     params:
       - train.n_estimators
       - train.seed
+      - model.name
+      - model.version
     outs:
       - models/sentiment_model_v1.0.0.pkl
   evaluate:
-    cmd: python src/evaluate.py data/raw/restaurant_sentiment.csv models/sentiment_model_v1.0.0.pkl reports/evaluation_metrics.json
+    cmd: make evaluate
     deps:
-      - src/evaluate.py
-      - data/raw/restaurant_sentiment.csv
       - models/sentiment_model_v1.0.0.pkl
+      - data/processed/test_dataset.csv
+      - model_training/modeling/evaluate.py
     params:
       - evaluate.seed
+      - model.name
+      - model.version
     metrics:
       - reports/evaluation_metrics.json:
           cache: false
