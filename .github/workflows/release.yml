@@ -34,7 +34,7 @@ jobs:
           python model_training/dataset.py split
 
       - name: Train model and save artifact
-        run: python model_training/modeling/train.py train --version ${{ steps.version.outputs.VERSION }}
+        run: python model_training/modeling/train.py --version ${{ steps.version.outputs.VERSION }}
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
