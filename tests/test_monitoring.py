@@ -1,6 +1,9 @@
-import pytest, time
+import time
+
+import pytest
 
 MAX_MS = 50
+
 
 @pytest.mark.monitoring
 def test_inference_latency(model):

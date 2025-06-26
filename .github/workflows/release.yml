@@ -1,42 +1,48 @@
 name: Train and Save Model
 
 on:
-    push:
-        tags: ['v[0-9]+.[0-9]+.[0-9]+']
+  push:
+    tags: ["v[0-9]+.[0-9]+.[0-9]+"]
 
 jobs:
-    train-model:
-        runs-on: ubuntu-24.04
+  train-model:
+    runs-on: ubuntu-24.04
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-            - name: Extract version from tag
-              id: version
-              run: |
-                  TAG=${GITHUB_REF#refs/tags/}
-                  echo "VERSION=${TAG#v}" >> $GITHUB_OUTPUT
-                  echo "Extracted version is ${TAG#v}"
+      - name: Extract version from tag
+        id: version
+        run: |
+          TAG=${GITHUB_REF#refs/tags/}
+          echo "VERSION=${TAG#v}" >> $GITHUB_OUTPUT
+          echo "Extracted version is ${TAG#v}"
 
-            - name: Set up Python
-              uses: actions/setup-python@v5
-              with:
-                  python-version: '3.12.9'
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12.9"
 
-            - name: Install dependencies
-              run: pip install -r requirements.txt
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
-            - name: Train model and save artifact
-              run: python model_training/pipeline.py ${{ steps.version.outputs.VERSION }}
+      - name: Download and preprocess dataset
+        run: |
+          python model_training/dataset.py download
+          python model_training/dataset.py preprocess
+          python model_training/dataset.py split
 
-            - name: Create Release
-              uses: softprops/action-gh-release@v1
-              id: create_release
-              env:
-                  GITHUB_TOKEN: ${{secrets.RELEASE_SECRET}}
-              with:
-                  name: Model Release v${{ steps.version.outputs.VERSION }}
-                  files: ./models/sentiment_model_v${{ steps.version.outputs.VERSION }}.pkl
-                  draft: false
-                  prerelease: false
+      - name: Train model and save artifact
+        run: python model_training/modeling/train.py train --version ${{ steps.version.outputs.VERSION }}
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{secrets.RELEASE_SECRET}}
+        with:
+          name: Model Release v${{ steps.version.outputs.VERSION }}
+          files: ./models/sentiment_model_v${{ steps.version.outputs.VERSION }}.pkl
+          draft: false
+          prerelease: false

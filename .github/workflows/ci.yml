@@ -25,50 +25,43 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Preprocess dataset
+      - name: Download and preprocess dataset
         run: |
-          python -m model_training.dataset main
+          python model_training/dataset.py download
+          python model_training/dataset.py preprocess
 
       - name: Run tests and capture adequacy score
-        run: |
-          pytest tests/ | tee test_output.txt
+        run: pytest tests/ | tee reports/test_output.txt
 
       - name: Run tests with coverage
-        run: |
-          pytest --cov=src --cov-config=coverage.ini --cov-report=xml --cov-report=term tests/
-
-
-      # - name: Run tests with coverage
-      #   run: |
-      #     pytest --cov=src --cov-report=xml --cov-report=term tests/
+        run: pytest --cov=model_training --cov-config=coverage.ini --cov-report=xml --cov-report=term tests/
 
       - name: Run pylint
-        run: |
-          pylint src/ model_training/ --fail-under=7
+        run: pylint model_training/ tests/ --fail-under=7
 
       - name: Install pybadges
         run: pip install pybadges
 
       - name: Generate pylint badge
         run: |
-          pylint model_training/ src/ --exit-zero > pylint_output.txt || true
+          pylint model_training/ tests/ --exit-zero > reports/pylint_output.txt || true
           echo "---- Pylint output start ----"
-          cat pylint_output.txt
+          cat reports/pylint_output.txt
           echo "---- Pylint output end ----"
 
-          SCORE=$(grep "rated at" pylint_output.txt | sed -E 's/.*rated at ([0-9]+\.[0-9]+)\/.*/\1/' || echo "0")
+          SCORE=$(grep "rated at" reports/pylint_output.txt | sed -E 's/.*rated at ([0-9]+\.[0-9]+)\/.*/\1/' || echo "0")
           echo "Pylint score: $SCORE"
 
           mkdir -p badges
-          python -m pybadges --left-text="pylint" --right-text="$SCORE/10" --right-color="green" > badges/pylint.svg
+          python -m pybadges --left-text="pylint" --right-text="$SCORE/10" --right-color="green" > reports/badges/pylint.svg
 
       - name: Generate test adequacy badge
         run: |
-          RAW_SCORE=$(cat ml_test_score.txt)
+          RAW_SCORE=$(cat reports/ml_test_score.txt)
           ADEQUACY_SCORE=${RAW_SCORE:-0}
           echo "Adequacy score is $ADEQUACY_SCORE%"
           mkdir -p badges
-          python -m pybadges --left-text="adequacy" --right-text="$ADEQUACY_SCORE%" --right-color="orange" > badges/adequacy.svg
+          python -m pybadges --left-text="adequacy" --right-text="$ADEQUACY_SCORE%" --right-color="orange" > reports/badges/adequacy.svg
 
       - name: Generate test coverage badge
         run: |
@@ -76,8 +69,7 @@ jobs:
           echo "Coverage is $COVERAGE%"
 
           mkdir -p badges
-          python -m pybadges --left-text="coverage" --right-text="$COVERAGE%" --right-color="blue" > badges/coverage.svg
-
+          python -m pybadges --left-text="coverage" --right-text="$COVERAGE%" --right-color="blue" > reports/badges/coverage.svg
 
       - name: Commit and push badge
         if: github.event_name == 'push'
@@ -85,7 +77,6 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
           git remote set-url origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/${{ github.repository }}
-          git add badges/pylint.svg badges/adequacy.svg badges/coverage.svg
+          git add reports/badges/pylint.svg reports/badges/adequacy.svg reports/badges/coverage.svg
           git commit -m "Auto-update pylint badge" || echo "No changes to commit"
           git push origin HEAD:${{ github.ref_name }}
-        

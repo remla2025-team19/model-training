@@ -1,61 +1,63 @@
-from loguru import logger
-from sklearn.model_selection import train_test_split
-import typer
+from pathlib import Path
 
-from model_training.config import REPORTS_DIR
-from model_training.dataset import preprocess_data
-from model_training.modeling import evaluate_model, save_model, train_model
-
-app = typer.Typer()
+from model_training.dataset import load_data, split_data, preprocess_data
+from model_training.modeling.evaluate import compute_internal_metrics
+from model_training.modeling.train import load_vectorizer, save_model, train_classifier
 
 
-def run_pipeline(version: str = "1.0.0"):
-    """
-    Run the complete training pipeline.
-
+def run_pipeline(
+    input_dataset: Path = Path("data/raw/restaurant_sentiment.csv"),
+    vectorizer_path: Path = Path("data/processed/vectorizer.pkl"),
+    output_data_dir: Path = Path("data/processed"),
+    model_dir: Path = Path("models"),
+    model_name: str = "sentiment_model",
+    model_version: str = "1.0.0",
+):
+    """Run the complete training pipeline and return (model_path, accuracy)
     Args:
-        version: Model version string for saving and reports
-
+        input_dataset: Path to the input dataset CSV file
+        vectorizer_path: Path to the saved CountVectorizer
+        output_data_dir: Directory to save the split datasets
+        model_dir: Directory to save the trained model
+        model_name: Name of the model file (without extension)
+        model_version: Version string for the model
     Returns:
-        tuple: (model_path, accuracy) - Path to saved model and accuracy score
+        Tuple[str, float]: Path to the saved model and its accuracy on the test set
     """
-    logger.info(f"Starting training pipeline for version {version}")
+    # Step 0: Preprocess data
+    clean_data_path = output_data_dir / "dataset.csv"
+    preprocess_data(input_dataset, clean_data_path, vectorizer_path)
 
-    # Load and preprocess data
-    logger.info("Loading and preprocessing data...")
-    X, y, cv = preprocess_data()
+    # Step 1: Split data
+    train_path = output_data_dir / "train_dataset.csv"
+    test_path = output_data_dir / "test_dataset.csv"
+    split_data(
+        input_path=clean_data_path,
+        train_output_path=train_path,
+        test_output_path=test_path,
+        test_size=0.2,
+        random_state=42,
+    )
 
-    # Split data
-    logger.info("Splitting data into train/test sets...")
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    # Step 2: Load training data
+    train_data = load_data(train_path)
+    X_train = train_data.drop(columns=["Label"]).to_numpy()
+    y_train = train_data["Label"].to_numpy()
 
-    # Train model
-    logger.info("Training model...")
-    model = train_model(X_train, y_train)
+    # Step 3: Load vectorizer and train model
+    vectorizer = load_vectorizer(vectorizer_path)
+    classifier = train_classifier(X_train, y_train)
 
-    # Save model
-    logger.info("Saving model...")
-    model_path = save_model(model, cv, version)
+    # Step 4: Save model
+    model_path = model_dir / f"{model_name}_v{model_version}.pkl"
+    save_model(classifier, vectorizer, model_version, model_path)
 
-    # Evaluate model
-    logger.info("Evaluating model...")
-    report_path = REPORTS_DIR / f"report_v{version}.txt"
-    accuracy = evaluate_model(model, X_test, y_test, report_path)
+    # Step 5: Evaluate for accuracy
+    test_data = load_data(test_path)
+    X_test = test_data.drop(columns=["Label"]).to_numpy()
+    y_test = test_data["Label"].to_numpy()
 
-    logger.success(f"Pipeline complete! Model saved to: {model_path}")
-    logger.success(f"Model accuracy: {accuracy:.4f}")
+    metrics, _ = compute_internal_metrics(classifier, X_test, y_test)
+    accuracy = metrics["accuracy"]
 
-    return model_path, accuracy
-
-
-@app.command()
-def main(version: str = typer.Argument("1.0.0", help="Model version for saving and reports")):
-    """Run the complete training pipeline."""
-    model_path, accuracy = run_pipeline(version)
-
-    logger.success(f"Model training complete. Model path: {model_path}")
-    logger.success(f"Model accuracy: {accuracy:.4f}")
-
-
-if __name__ == "__main__":
-    app()
+    return str(model_path), accuracy
