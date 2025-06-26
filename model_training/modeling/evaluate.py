@@ -1,50 +1,101 @@
+import json
+import pickle
 from pathlib import Path
 
 from loguru import logger
-from sklearn.metrics import accuracy_score, classification_report
+import pandas as pd
+from sklearn.metrics import (
+    accuracy_score,
+    classification_report,
+    precision_score,
+    recall_score,
+    f1_score,
+)
+import typer
 
-from model_training.config import REPORTS_DIR
+from model_training.config import MODELS_DIR, PROCESSED_DATA_DIR, REPORTS_DIR
+
+app = typer.Typer()
 
 
-def evaluate_model(classifier, X_test, y_test, report_path: str | Path | None = None):
-    """
-    Evaluate a trained model and optionally save results to a report file.
+def load_model(model_path: Path):
+    """Load the trained model from file"""
+    with open(model_path, "rb") as f:
+        model_data = pickle.load(f)
+    logger.info(f"Model loaded from {model_path}")
+    return model_data["classifier"], model_data["vectorizer"]
 
-    Args:
-        classifier: Trained classifier model
-        X_test: Test features
-        y_test: Test labels
-        report_path: Optional path to save evaluation report. If None, uses default in REPORTS_DIR
 
-    Returns:
-        float: Model accuracy score
-    """
+def compute_internal_metrics(classifier, X_test, y_test):
+    """Internal function to evaluate a model and return metrics"""
     y_pred = classifier.predict(X_test)
-    accuracy = accuracy_score(y_test, y_pred)
+
+    metrics = {
+        "accuracy": accuracy_score(y_test, y_pred),
+        "precision": precision_score(y_test, y_pred, average="weighted"),
+        "recall": recall_score(y_test, y_pred, average="weighted"),
+        "f1_score": f1_score(y_test, y_pred, average="weighted"),
+        "test_samples": len(y_test),
+    }
 
     # Generate classification report
     class_report = classification_report(y_test, y_pred)
 
-    if report_path is not None:
-        # Use provided path or default to REPORTS_DIR
-        if report_path == "report.txt":  # Handle legacy default
-            report_file = REPORTS_DIR / "evaluation_report.txt"
-        else:
-            report_file = Path(report_path) if isinstance(report_path, str) else report_path
+    return metrics, class_report
 
-        # Ensure reports directory exists
-        report_file.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(report_file, "w", encoding="utf-8") as f:
-            f.write(f"Model accuracy: {accuracy:.4f}\n")
-            f.write("\nClassification Report:\n")
-            f.write(class_report)
+@app.command()
+def evaluate(
+    model_dir: Path = MODELS_DIR,
+    model_name: str = "sentiment_model",
+    model_version: str = "1.0.0",
+    test_dataset_path: Path = PROCESSED_DATA_DIR / "test_dataset.csv",
+    metrics_output_path: Path = REPORTS_DIR / "evaluation_metrics.json",
+    report_output_path: Path = REPORTS_DIR / "evaluation_report.txt",
+):
+    """Evaluate the trained sentiment analysis model.
 
-        logger.info(f"Evaluation report saved to {report_file}")
-    else:
-        # Log results instead of printing
-        logger.info(f"Model accuracy: {accuracy:.4f}")
-        logger.info("Classification Report:")
-        logger.info(f"\n{class_report}")
+    Args:
+        model_path: Path to the trained model pickle file
+        test_dataset_path: Path to the test dataset CSV
+        metrics_output_path: Path to save the evaluation metrics JSON
+        report_output_path: Path to save the detailed evaluation report
+    """
+    logger.info("Loading trained model...")
+    model_path = model_dir / f"{model_name}_v{model_version}.pkl"
+    classifier, _ = load_model(model_path)
 
-    return accuracy
+    logger.info("Loading test dataset...")
+    test_data = pd.read_csv(test_dataset_path)
+
+    # Separate features and labels
+    X_test = test_data.drop(columns=["Label"]).to_numpy()
+    y_test = test_data["Label"].to_numpy()
+
+    logger.info("Evaluating model...")
+    metrics, class_report = compute_internal_metrics(classifier, X_test, y_test)
+
+    # Save metrics as JSON
+    metrics_output_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(metrics_output_path, "w") as f:
+        json.dump(metrics, f, indent=2)
+    logger.info(f"Metrics saved to {metrics_output_path}")
+
+    # Save detailed report
+    report_output_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(report_output_path, "w", encoding="utf-8") as f:
+        f.write(f"Model accuracy: {metrics['accuracy']:.4f}\n")
+        f.write(f"Precision: {metrics['precision']:.4f}\n")
+        f.write(f"Recall: {metrics['recall']:.4f}\n")
+        f.write(f"F1 Score: {metrics['f1_score']:.4f}\n")
+        f.write(f"Test samples: {metrics['test_samples']}\n")
+        f.write("\nClassification Report:\n")
+        f.write(class_report)  # type: ignore
+    logger.info(f"Evaluation report saved to {report_output_path}")
+
+    logger.success(f"Model evaluation completed! Accuracy: {metrics['accuracy']:.4f}")
+    return metrics
+
+
+if __name__ == "__main__":
+    app()
