@@ -77,6 +77,9 @@ pip install dvc[gs]
 dvc remote add -d sentiment_remote gs://remla2025-team19-bucket
 ```
 3. Add credentials (keep it local since it is a secret)
+
+The secret for testing purposes can be found in `secret/remla_secret.json`.
+
 ```bash
 dvc remote modify --local sentiment_remote credentialpath `/path/to/remla_secret.json`
 ```
