@@ -111,7 +111,7 @@ data: preprocess
 
 ## Set up project and run all tasks
 .PHONY: all
-all: create_environment requirements lint test download preprocess split train evaluate
+all: create_environment requirements lint download preprocess split test train evaluate
 	@echo ">>> All tasks completed successfully!"
 
 
