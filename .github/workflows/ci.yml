@@ -60,7 +60,7 @@ jobs:
           echo "Pylint score: $SCORE"
 
           mkdir -p badges
-          python -m pybadges --left-text="pylint" --right-text="$SCORE/10" --right-color="green" > badges/pylint.svg
+          python -m pybadges --left-text="pylint" --right-text="$SCORE/10" --right-color="green" > reports/badges/pylint.svg
 
       - name: Generate test adequacy badge
         run: |
@@ -68,7 +68,7 @@ jobs:
           ADEQUACY_SCORE=${RAW_SCORE:-0}
           echo "Adequacy score is $ADEQUACY_SCORE%"
           mkdir -p badges
-          python -m pybadges --left-text="adequacy" --right-text="$ADEQUACY_SCORE%" --right-color="orange" > badges/adequacy.svg
+          python -m pybadges --left-text="adequacy" --right-text="$ADEQUACY_SCORE%" --right-color="orange" > reports/badges/adequacy.svg
 
       - name: Generate test coverage badge
         run: |
@@ -76,7 +76,7 @@ jobs:
           echo "Coverage is $COVERAGE%"
 
           mkdir -p badges
-          python -m pybadges --left-text="coverage" --right-text="$COVERAGE%" --right-color="blue" > badges/coverage.svg
+          python -m pybadges --left-text="coverage" --right-text="$COVERAGE%" --right-color="blue" > reports/badges/coverage.svg
 
 
       - name: Commit and push badge
@@ -85,7 +85,7 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
           git remote set-url origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/${{ github.repository }}
-          git add badges/pylint.svg badges/adequacy.svg badges/coverage.svg
+          git add reports/badges/pylint.svg reports/badges/adequacy.svg reports/badges/coverage.svg
           git commit -m "Auto-update pylint badge" || echo "No changes to commit"
           git push origin HEAD:${{ github.ref_name }}
         
