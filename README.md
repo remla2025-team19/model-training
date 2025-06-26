@@ -1,9 +1,8 @@
 # model-training
 
-![Pylint Score](badges/pylint.svg)
-![Coverage](badges/coverage.svg)
-![Adequacy](badges/adequacy.svg)
-
+![Pylint Score](reports/badges/pylint.svg)
+![Coverage](reports/badges/coverage.svg)
+![Adequacy](reports/badges/adequacy.svg)
 
 <a target="_blank" href="https://cookiecutter-data-science.drivendata.org/">
     <img src="https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter" />
@@ -12,10 +11,10 @@
 Training pipeline for restaurant review sentiment analysis ML model
 
 Repository Link: https://github.com/remla2025-team19/model-training
+
 ## Requirements
 
 -   make
--   [uv](https://docs.astral.sh/uv/#installation)
 
 ## Setup
 
@@ -67,15 +66,20 @@ make pipeline VERSION=1.0.1
 ```
 
 ## Pipeline Management with DVC
+
 1. Setting up the Google Cloud remote storage.
-First ensure that ```dvc[gs]``` is installed
+   First ensure that `dvc[gs]` is installed
+
 ```bash
 pip install dvc[gs]
 ```
-2. Create remote 
+
+2. Create remote
+
 ```bash
 dvc remote add -d sentiment_remote gs://remla2025-team19-bucket
 ```
+
 3. Add credentials (keep it local since it is a secret)
 
 In order to run these run the pipelines you will need access to `remla_secret.json`. For people not a part of Team-19, please send a request to "sidsharma620@gmail.com".
@@ -83,17 +87,24 @@ In order to run these run the pipelines you will need access to `remla_secret.js
 ```bash
 dvc remote modify --local sentiment_remote credentialpath "/path/to/remla_secret.json"
 ```
+
 4. Run your pipeline and push
+
 ```bash
 dvc repro -f
 dvc push
 ```
+
 5. To run specific stages
+
 ```bash
 dvc repro prepare
 ```
+
 6. Conduct custom experiments by altering your parameters in params.yaml
+
 ```bash
 dvc exp run -S {stage_name}.{parameter}={value}
 ```
+
 ---
