@@ -19,7 +19,6 @@ def evaluate_model(test_path, model_path, metrics_path, params):
 
     corpus = preprocessor.preprocess_texts(test_data["Review"].tolist())
 
-    cv = CountVectorizer(max_features=1420)
     X_test = vectorizer.transform(corpus).toarray()
     y_test = test_data['Liked']
     
