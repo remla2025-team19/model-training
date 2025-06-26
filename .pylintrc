@@ -454,6 +454,9 @@ disable=raw-checker-failed,
 # it should appear only once). See also the "--disable" option for examples.
 enable=
 
+[FILE_PATTERN:test_.*\.py$]
+disable=missing-function-docstring,data-leakage-detected
+
 
 [METHOD_ARGS]
 

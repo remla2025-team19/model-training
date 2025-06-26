@@ -27,7 +27,7 @@ def model():
             model_name="sentiment_model",
             model_version="1.0.0",
         )
-    with open(_MODEL_PATH, "rb") as f:
+    with open(_MODEL_PATH, "rb", encoding="utf-8") as f:
         data = pickle.load(f)
     clf, vec = data["classifier"], data["vectorizer"]
     return lambda text: clf.predict(vec.transform([text]).toarray())[0]
@@ -67,5 +67,5 @@ def pytest_terminal_summary(terminalreporter):
     percentage = (total_score / max_score) * 100 if max_score else 0
     terminalreporter.write_line(f"::ML_TEST_SCORE::{percentage:.0f}")
 
-    with open("reports/ml_test_score.txt", "w") as f:
+    with open("reports/ml_test_score.txt", "w", encoding="utf-8") as f:
         f.write(f"{percentage:.0f}")
