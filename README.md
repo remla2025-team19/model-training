@@ -78,14 +78,14 @@ dvc remote add -d sentiment_remote gs://remla2025-team19-bucket
 ```
 3. Add credentials (keep it local since it is a secret)
 
-The secret for testing purposes can be found in `secret/remla_secret.json`.
+In order to run these run the pipelines you will need access to `remla_secret.json`. For people not a part of Team-19, please send a request to "sidsharma620@gmail.com".
 
 ```bash
-dvc remote modify --local sentiment_remote credentialpath `/path/to/remla_secret.json`
+dvc remote modify --local sentiment_remote credentialpath "/path/to/remla_secret.json"
 ```
 4. Run your pipeline and push
 ```bash
-dvc repro
+dvc repro -f
 dvc push
 ```
 5. To run specific stages
