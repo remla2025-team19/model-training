@@ -1,4 +1,3 @@
-from json import load
 from pathlib import Path
 
 from model_training.dataset import load_data, split_data, preprocess_data
