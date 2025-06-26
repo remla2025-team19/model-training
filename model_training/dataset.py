@@ -1,14 +1,14 @@
+import pickle
 from pathlib import Path
 from typing import Optional
-import pickle
 
-from lib_ml.preprocessing import TextPreprocessor
-from loguru import logger
 import pandas as pd
 import requests
+import typer
+from lib_ml.preprocessing import TextPreprocessor
+from loguru import logger
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import train_test_split
-import typer
 
 from model_training.config import (
     DEFAULT_TRAINING_DATA_URL,
