@@ -1,9 +1,9 @@
-import os
 import pickle
+from pathlib import Path
 import pytest
 from model_training.pipeline import run_pipeline
 
-_MODEL_PATH = os.path.join("models", "sentiment_model_v1.0.0.pkl")
+_MODEL_PATH = Path("models") / "sentiment_model_v1.0.0.pkl"
 
 # Rubric definition
 RUBRIC_QUESTIONS = {
@@ -19,8 +19,14 @@ category_pass_counts = {key: 0 for key in RUBRIC_QUESTIONS}
 
 @pytest.fixture(scope="session")
 def model():
-    if not os.path.exists(_MODEL_PATH):
-        run_pipeline("1.0.0")
+    if not _MODEL_PATH.exists():
+        run_pipeline(
+            input_dataset=Path("data/raw/restaurant_sentiment.csv"),
+            output_data_dir=Path("data/processed"),
+            model_dir=Path("models"),
+            model_name="sentiment_model",
+            model_version="1.0.0",
+        )
     with open(_MODEL_PATH, "rb") as f:
         data = pickle.load(f)
     clf, vec = data["classifier"], data["vectorizer"]
@@ -61,5 +67,5 @@ def pytest_terminal_summary(terminalreporter):
     percentage = (total_score / max_score) * 100 if max_score else 0
     terminalreporter.write_line(f"::ML_TEST_SCORE::{percentage:.0f}")
 
-    with open("ml_test_score.txt", "w") as f:
+    with open("reports/ml_test_score.txt", "w") as f:
         f.write(f"{percentage:.0f}")

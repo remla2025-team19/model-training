@@ -64,7 +64,7 @@ jobs:
 
       - name: Generate test adequacy badge
         run: |
-          RAW_SCORE=$(cat ml_test_score.txt)
+          RAW_SCORE=$(cat reports/ml_test_score.txt)
           ADEQUACY_SCORE=${RAW_SCORE:-0}
           echo "Adequacy score is $ADEQUACY_SCORE%"
           mkdir -p badges
