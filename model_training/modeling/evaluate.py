@@ -16,7 +16,7 @@ import typer
 
 
 from model_training.config import MODELS_DIR, PROCESSED_DATA_DIR, REPORTS_DIR
-from model_training.utils import load_params
+from model_training.utils import resolve_model_params
 
 app = typer.Typer()
 
@@ -68,18 +68,11 @@ def evaluate(
         report_output_path: Path to save the detailed evaluation report
         params_file: Path to parameters YAML file
     """
-    # Load parameters from YAML file
-    params = load_params(params_file)
-    model_params = params.get("model", {})  # Version comes from model params
-
-    # Use CLI arguments if provided, otherwise use params.yaml values, otherwise use defaults
-    final_model_name = (
-        model_name if model_name is not None else model_params.get("name", "sentiment_model")
-    )
-    final_version = (
-        model_version
-        if model_version is not None
-        else model_params.get("version", "1.0.0")
+    # Resolve model name and version from CLI args or params.yaml
+    final_model_name, final_version = resolve_model_params(
+        model_name=model_name,
+        model_version=model_version,
+        params_file=params_file
     )
 
     logger.info(f"Evaluating model {final_model_name} version: {final_version}")
