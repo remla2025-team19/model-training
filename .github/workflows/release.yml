@@ -27,8 +27,14 @@ jobs:
             - name: Install dependencies
               run: pip install -r requirements.txt
 
+            - name: Download and preprocess dataset
+              run: |
+                  python model_training/dataset.py download
+                  python model_training/dataset.py preprocess
+                  python model_training/dataset.py split
+
             - name: Train model and save artifact
-              run: python model_training/pipeline.py ${{ steps.version.outputs.VERSION }}
+              run: python model_training/modeling/train.py train --version ${{ steps.version.outputs.VERSION }}
 
             - name: Create Release
               uses: softprops/action-gh-release@v1
