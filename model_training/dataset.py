@@ -15,6 +15,7 @@ from model_training.config import (
     PROCESSED_DATA_DIR,
     RAW_DATA_DIR,
 )
+from model_training.utils import load_params
 
 app = typer.Typer()
 
@@ -168,8 +169,9 @@ def split(
     input_path: Path = PROCESSED_DATA_DIR / "dataset.csv",
     train_output_path: Path = PROCESSED_DATA_DIR / "train_dataset.csv",
     test_output_path: Path = PROCESSED_DATA_DIR / "test_dataset.csv",
-    test_size: float = 0.2,
-    random_state: int = 42,
+    test_size: Optional[float] = None,
+    random_state: Optional[int] = None,
+    params_file: Path = Path("params.yaml"),
 ):
     """Split processed dataset into train and test sets.
 
@@ -179,9 +181,25 @@ def split(
         test_output_path: Path to save the test dataset
         test_size: Proportion of dataset to include in test split
         random_state: Random state for reproducible splits
+        params_file: Path to parameters YAML file
     """
+    # Load parameters from YAML file
+    params = load_params(params_file)
+    prepare_params = params.get("prepare", {})
+
+    # Use CLI arguments if provided, otherwise use params.yaml values, otherwise use defaults
+    final_test_size = test_size if test_size is not None else 0.2
+    final_random_state = (
+        random_state if random_state is not None else prepare_params.get("seed", 42)
+    )
+
+    logger.info(f"Using test_size={final_test_size}, random_state={final_random_state}")
     return split_data(
-        input_path, train_output_path, test_output_path, test_size, random_state
+        input_path,
+        train_output_path,
+        test_output_path,
+        final_test_size,
+        final_random_state,
     )
 
 

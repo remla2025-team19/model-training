@@ -1,5 +1,6 @@
 import pickle
 from pathlib import Path
+from typing import Optional
 
 import pandas as pd
 import typer
@@ -7,6 +8,7 @@ from loguru import logger
 from sklearn.naive_bayes import GaussianNB
 
 from model_training.config import MODELS_DIR, PROCESSED_DATA_DIR
+from model_training.utils import load_params
 
 app = typer.Typer()
 
@@ -46,16 +48,29 @@ def train(
     vectorizer_path: Path = PROCESSED_DATA_DIR / "vectorizer.pkl",
     model_output_dir: Path = MODELS_DIR,
     model_name: str = "sentiment_model",
-    version: str = "1.0.0",
+    version: Optional[str] = None,
+    params_file: Path = Path("params.yaml"),
 ):
     """Train the sentiment analysis model.
 
     Args:
         train_dataset_path: Path to the training dataset CSV
         vectorizer_path: Path to the saved CountVectorizer
-        model_output_path: Path to save the trained model
+        model_output_dir: Directory to save the trained model
+        model_name: Name of the model file (without extension)
         version: Version string for the model
+        params_file: Path to parameters YAML file
     """
+    # Load parameters from YAML file
+    params = load_params(params_file)
+    train_params = params.get("train", {})
+
+    # Use CLI arguments if provided, otherwise use params.yaml values, otherwise use defaults
+    final_version = (
+        version if version is not None else train_params.get("version", "1.0.0")
+    )
+
+    logger.info(f"Training model version: {final_version}")
     logger.info("Loading training dataset...")
     train_data = pd.read_csv(train_dataset_path)
 
@@ -70,9 +85,9 @@ def train(
     classifier = train_classifier(X_train, y_train)
 
     logger.info("Saving model...")
-    model_output_path = model_output_dir / f"{model_name}_v{version}.pkl"
+    model_output_path = model_output_dir / f"{model_name}_v{final_version}.pkl"
     model_output_path.parent.mkdir(parents=True, exist_ok=True)
-    save_model(classifier, vectorizer, version, model_output_path)
+    save_model(classifier, vectorizer, final_version, model_output_path)
 
     logger.success(f"Model training completed! Model saved to: {model_output_path}")
     return model_output_path

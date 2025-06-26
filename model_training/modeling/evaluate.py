@@ -1,6 +1,7 @@
 import json
 import pickle
 from pathlib import Path
+from typing import Optional
 
 from loguru import logger
 import pandas as pd
@@ -13,7 +14,9 @@ from sklearn.metrics import (
 )
 import typer
 
+
 from model_training.config import MODELS_DIR, PROCESSED_DATA_DIR, REPORTS_DIR
+from model_training.utils import load_params
 
 app = typer.Typer()
 
@@ -48,21 +51,37 @@ def compute_internal_metrics(classifier, X_test, y_test):
 def evaluate(
     model_dir: Path = MODELS_DIR,
     model_name: str = "sentiment_model",
-    model_version: str = "1.0.0",
+    model_version: Optional[str] = None,
     test_dataset_path: Path = PROCESSED_DATA_DIR / "test_dataset.csv",
     metrics_output_path: Path = REPORTS_DIR / "evaluation_metrics.json",
     report_output_path: Path = REPORTS_DIR / "evaluation_report.txt",
+    params_file: Path = Path("params.yaml"),
 ):
     """Evaluate the trained sentiment analysis model.
 
     Args:
-        model_path: Path to the trained model pickle file
+        model_dir: Directory containing the trained model
+        model_name: Name of the model file (without version and extension)
+        model_version: Version of the model to evaluate
         test_dataset_path: Path to the test dataset CSV
         metrics_output_path: Path to save the evaluation metrics JSON
         report_output_path: Path to save the detailed evaluation report
+        params_file: Path to parameters YAML file
     """
+    # Load parameters from YAML file
+    params = load_params(params_file)
+    train_params = params.get("train", {})  # Version comes from train params
+
+    # Use CLI arguments if provided, otherwise use params.yaml values, otherwise use defaults
+    final_version = (
+        model_version
+        if model_version is not None
+        else train_params.get("version", "1.0.0")
+    )
+
+    logger.info(f"Evaluating model version: {final_version}")
     logger.info("Loading trained model...")
-    model_path = model_dir / f"{model_name}_v{model_version}.pkl"
+    model_path = model_dir / f"{model_name}_v{final_version}.pkl"
     classifier, _ = load_model(model_path)
 
     logger.info("Loading test dataset...")
