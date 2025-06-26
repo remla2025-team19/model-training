@@ -45,7 +45,7 @@ pip install 'dvc[gs]'
 In order to run these run the pipelines you will need access to `remla_secret.json`. For people not a part of Team-19, please send a request to "sidsharma620@gmail.com".
 
 ```bash
-dvc remote add -d sentiment_remote gs://remla2025-team19-bucket
+dvc remote add -d sentiment_remote gs://remla2025-team19-bucket -f
 dvc remote modify --local sentiment_remote credentialpath /path/to/remla_secret.json
 ```
 
