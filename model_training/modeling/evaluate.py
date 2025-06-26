@@ -99,7 +99,7 @@ def evaluate(
 
     # Save metrics as JSON
     metrics_output_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(metrics_output_path, "w") as f:
+    with open(metrics_output_path, "w", encoding="utf-8") as f:
         json.dump(metrics, f, indent=2)
     logger.info(f"Metrics saved to {metrics_output_path}")
 
