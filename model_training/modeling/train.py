@@ -47,7 +47,7 @@ def train(
     train_dataset_path: Path = PROCESSED_DATA_DIR / "train_dataset.csv",
     vectorizer_path: Path = PROCESSED_DATA_DIR / "vectorizer.pkl",
     model_output_dir: Path = MODELS_DIR,
-    model_name: str = "sentiment_model",
+    model_name: Optional[str] = None,
     version: Optional[str] = None,
     params_file: Path = Path("params.yaml"),
 ):
@@ -63,11 +63,14 @@ def train(
     """
     # Load parameters from YAML file
     params = load_params(params_file)
-    train_params = params.get("train", {})
+    model_params = params.get("model", {})
 
     # Use CLI arguments if provided, otherwise use params.yaml values, otherwise use defaults
+    final_model_name = (
+        model_name if model_name is not None else model_params.get("name", "sentiment_model")
+    )
     final_version = (
-        version if version is not None else train_params.get("version", "1.0.0")
+        version if version is not None else model_params.get("version", "1.0.0")
     )
 
     logger.info(f"Training model version: {final_version}")
@@ -85,7 +88,7 @@ def train(
     classifier = train_classifier(X_train, y_train)
 
     logger.info("Saving model...")
-    model_output_path = model_output_dir / f"{model_name}_v{final_version}.pkl"
+    model_output_path = model_output_dir / f"{final_model_name}_v{final_version}.pkl"
     model_output_path.parent.mkdir(parents=True, exist_ok=True)
     save_model(classifier, vectorizer, final_version, model_output_path)
 

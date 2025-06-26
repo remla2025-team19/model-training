@@ -50,7 +50,7 @@ def compute_internal_metrics(classifier, X_test, y_test):
 @app.command()
 def evaluate(
     model_dir: Path = MODELS_DIR,
-    model_name: str = "sentiment_model",
+    model_name: Optional[str] = None,
     model_version: Optional[str] = None,
     test_dataset_path: Path = PROCESSED_DATA_DIR / "test_dataset.csv",
     metrics_output_path: Path = REPORTS_DIR / "evaluation_metrics.json",
@@ -70,18 +70,21 @@ def evaluate(
     """
     # Load parameters from YAML file
     params = load_params(params_file)
-    train_params = params.get("train", {})  # Version comes from train params
+    model_params = params.get("model", {})  # Version comes from model params
 
     # Use CLI arguments if provided, otherwise use params.yaml values, otherwise use defaults
+    final_model_name = (
+        model_name if model_name is not None else model_params.get("name", "sentiment_model")
+    )
     final_version = (
         model_version
         if model_version is not None
-        else train_params.get("version", "1.0.0")
+        else model_params.get("version", "1.0.0")
     )
 
-    logger.info(f"Evaluating model version: {final_version}")
+    logger.info(f"Evaluating model {final_model_name} version: {final_version}")
     logger.info("Loading trained model...")
-    model_path = model_dir / f"{model_name}_v{final_version}.pkl"
+    model_path = model_dir / f"{final_model_name}_v{final_version}.pkl"
     classifier, _ = load_model(model_path)
 
     logger.info("Loading test dataset...")
