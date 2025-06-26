@@ -12,99 +12,212 @@ Training pipeline for restaurant review sentiment analysis ML model
 
 Repository Link: https://github.com/remla2025-team19/model-training
 
-## Requirements
+## Installation & Setup
 
--   make
+**Requirements:**
 
-## Setup
+-   Python 3.12.9
+-   `make`
+-   `dvc` (with Google Cloud support)
+-   (Recommended) `virtualenv` or `venv`
+
+**Setup Environment:**
 
 ```bash
+# Clone the repository
+git clone https://github.com/remla2025-team19/model-training.git
+cd model-training
+
+
+# Create the environment with venv, download requirements, and activate
 make create_environment
+source .venv/bin/activate
+
+# Install Python dependencies
 make requirements
+
+# Install DVC with Google Cloud support
+pip install 'dvc[gs]'
 ```
 
-## Example Usage
-
-Pass the model version as an argument to the pipeline:
-
-```bash
-make pipeline VERSION=1.0.1
-```
-
-## Project Organization
-
-```
-├── LICENSE            <- Open-source license if one is chosen
-├── Makefile           <- Makefile with convenience commands like `make data` or `make train`
-├── README.md          <- The top-level README for developers using this project.
-├── data
-│   ├── processed      <- The final, canonical data sets for modeling.
-│   └── raw            <- The original, immutable data dump.
-│
-├── models             <- Trained and serialized models, model predictions, or model summaries
-│
-├── pyproject.toml     <- Project configuration file with package metadata for
-│                         model_training and configuration for tools like black
-│
-├── reports            <- Evaluation reports
-│
-├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g.
-│                         generated with `pip freeze > requirements.txt`
-│
-└── model_training     <- Source code for use in this project.
-    │
-    ├── config.py               <- Store useful variables and configuration
-    │
-    ├── dataset.py              <- Scripts to download or generate data
-    │
-    ├── modeling
-    │   ├── __init__.py
-    │   ├── predict.py          <- Code to run model inference with trained models
-    │   └── train.py            <- Code to train models
-    │
-    └── pipeline.py             <- Code to run the full training pipeline
-```
-
-## Pipeline Management with DVC
-
-1. Setting up the Google Cloud remote storage.
-   First ensure that `dvc[gs]` is installed
-
-```bash
-pip install dvc[gs]
-```
-
-2. Create remote
-
-```bash
-dvc remote add -d sentiment_remote gs://remla2025-team19-bucket
-```
-
-3. Add credentials (keep it local since it is a secret)
+**DVC Remote Setup (Google Cloud):**
 
 In order to run these run the pipelines you will need access to `remla_secret.json`. For people not a part of Team-19, please send a request to "sidsharma620@gmail.com".
 
 ```bash
-dvc remote modify --local sentiment_remote credentialpath "/path/to/remla_secret.json"
+dvc remote add -d sentiment_remote gs://remla2025-team19-bucket
+dvc remote modify --local sentiment_remote credentialpath /path/to/remla_secret.json
 ```
 
-4. Run your pipeline and push
+## Usage
+
+Run full pipeline with DVC
 
 ```bash
-dvc repro -f
+dvc repro
+```
+
+or run the individual steps
+
+### 1. Download Raw Data
+
+-   **With DVC (Recommended):**
+
+    ```bash
+    dvc repro download
+    ```
+
+-   **With Make:**
+
+    ```bash
+    make download
+    ```
+
+-   **With Python:**
+
+    ```bash
+    python model_training/dataset.py download
+    ```
+
+### 2. Preprocess Data
+
+-   **With DVC (Recommended):**
+
+    ```bash
+    dvc repro preprocess
+    ```
+
+-   **With Make:**
+
+    ```bash
+    make preprocess
+    ```
+
+-   **With Python:**
+
+    ```bash
+    python model_training/dataset.py preprocess
+    ```
+
+### 3. Split Data
+
+-   **With DVC (Recommended):**
+
+    ```bash
+    dvc repro split
+    ```
+
+-   **With Make:**
+
+    ```bash
+    make split
+    ```
+
+-   **With Python:**
+
+    ```bash
+    python model_training/dataset.py split
+    ```
+
+### 4. Train Model
+
+-   **With DVC (Recommended):**
+
+    ```bash
+    dvc repro train
+    ```
+
+-   **With Make:**
+
+    ```bash
+    make train
+    ```
+
+-   **With Python:**
+
+    ```bash
+    python model_training/modeling/train.py --version 1.0.0
+    ```
+
+### 5. Evaluate Model
+
+-   **With DVC (Recommended):**
+
+    ```bash
+    dvc repro evaluate
+    ```
+
+-   **With Make:**
+
+    ```bash
+    make evaluate
+    ```
+
+-   **With Python:**
+
+    ```bash
+    python model_training/modeling/evaluate.py
+    ```
+
+### 6. Push Data/Models to Remote
+
+```bash
 dvc push
 ```
 
-5. To run specific stages
+### 7. Custom Experiments
 
-```bash
-dvc repro prepare
+-   Edit `params.yaml` and run:
+
+    ```bash
+    dvc exp run -S <stage>.<parameter>=<value>
+    ```
+
+## Example Project Organization
+
 ```
-
-6. Conduct custom experiments by altering your parameters in params.yaml
-
-```bash
-dvc exp run -S {stage_name}.{parameter}={value}
+├── LICENSE
+├── Makefile
+├── README.md
+├── data
+│   ├── processed
+│   └── raw
+│
+├── models
+│   └── sentiment_model_v1.0.0.pkl
+│
+├── pyproject.toml
+├── reports
+│   ├── evaluation_metrics.json
+│   ├── evaluation_report.txt
+│   └── badges/
+│       ├── adequacy.svg
+│       ├── coverage.svg
+│       └── pylint.svg
+│
+├── requirements.txt
+├── dvc.yaml / dvc.lock / params.yaml
+├── model_training
+│   ├── __init__.py
+│   ├── config.py
+│   ├── dataset.py
+│   ├── pipeline.py
+│   ├── utils.py
+│   └── modeling
+│       ├── __init__.py
+│       ├── train.py
+│       ├── evaluate.py
+│       └── predict.py
+│
+├── tests
+│   ├── conftest.py
+│   ├── test_data_integrity.py
+│   ├── test_infrastructure.py
+│   ├── test_metamorphic.py
+│   ├── test_model_development.py
+│   ├── test_monitoring.py
+│   └── test_training.py
+└── ...
 ```
 
 ---
