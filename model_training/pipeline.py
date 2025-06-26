@@ -1,12 +1,13 @@
+from json import load
 from pathlib import Path
 
-from model_training.dataset import load_data, split_data
+from model_training.dataset import load_data, split_data, preprocess_data
 from model_training.modeling.evaluate import compute_internal_metrics
 from model_training.modeling.train import load_vectorizer, save_model, train_classifier
 
 
 def run_pipeline(
-    input_dataset: Path = Path("data/processed/dataset.csv"),
+    input_dataset: Path = Path("data/raw/restaurant_sentiment.csv"),
     vectorizer_path: Path = Path("data/processed/vectorizer.pkl"),
     output_data_dir: Path = Path("data/processed"),
     model_dir: Path = Path("models"),
@@ -24,12 +25,15 @@ def run_pipeline(
     Returns:
         Tuple[str, float]: Path to the saved model and its accuracy on the test set
     """
+    # Step 0: Preprocess data
+    clean_data_path = output_data_dir / "dataset.csv"
+    preprocess_data(input_dataset, clean_data_path, vectorizer_path)
 
     # Step 1: Split data
     train_path = output_data_dir / "train_dataset.csv"
     test_path = output_data_dir / "test_dataset.csv"
     split_data(
-        input_path=input_dataset,
+        input_path=clean_data_path,
         train_output_path=train_path,
         test_output_path=test_path,
         test_size=0.2,
